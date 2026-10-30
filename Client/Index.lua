@@ -57,8 +57,10 @@ function UpdateAllPlayersScoreboard()
 	end
 end
 
--- Updates the scoreboards data every 1 seconds
+-- Updates the scoreboards data every 1 seconds, only while it's visible
 Timer.SetInterval(function()
+	if (not ScoreboardToggled and Deathmatch.match_state ~= MATCH_STATES.POST_TIME) then return end
+
 	UpdateAllPlayersScoreboard()
 end, 1000)
 

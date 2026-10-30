@@ -100,38 +100,44 @@ function AddKill(player, location)
 	end
 
 	if (DeathmatchSettings.mode == GAME_MODE.GUNGAME) then
-		if ((player:GetValue("Score") or 0) + 1 == #GunGameWeapons) then
-			UpdateMatchState(MATCH_STATES.POST_TIME)
-			Server:BroadcastChatMessage("<cyan>" .. player:GetName() .. "</> has won!")
-			return
-		end
-
 		-- Updates accumulated kill
 		local accumulated_kills = player:GetValue("AccumulatedKills") or 0
 
-		if (accumulated_kills >= 1) then
-			player:SetValue("AccumulatedKills", 0, true)
-			-- Adds score for killing
-			-- TODO sound
-			AddScore(player, 1, "level_up", "LEVEL UP", false, true)
-
-			-- If has a weapon, destroys it
-			local character = player:GetControlledCharacter()
-			local weapon = character:GetPicked()
-			local old_aiming = character:GetWeaponAimMode()
-
-			if (weapon and weapon:IsValid()) then
-				weapon:Destroy()
-			end
-
-			local new_weapon = SpawnWeapon(player)
-
-			if (new_weapon) then
-				character:PickUp(new_weapon)
-				character:SetWeaponAimMode(old_aiming)
-			end
-		else
+		-- Needs 2 kills to level up
+		if (accumulated_kills < 1) then
 			player:SetValue("AccumulatedKills", 1, true)
+			return
+		end
+
+		player:SetValue("AccumulatedKills", 0, true)
+
+		-- Leveling up past the last weapon means the player won the match
+		if ((player:GetValue("Score") or 0) + 1 >= #GunGameWeapons) then
+			UpdateMatchState(MATCH_STATES.POST_TIME)
+			Chat.BroadcastMessage("<cyan>" .. player:GetName() .. "</> has won!")
+			return
+		end
+
+		-- Adds score for killing
+		-- TODO sound
+		AddScore(player, 1, "level_up", "LEVEL UP", false, true)
+
+		local character = player:GetControlledCharacter()
+		if (not character) then return end
+
+		-- If has a weapon, destroys it
+		local weapon = character:GetPicked()
+		local old_aiming = character:GetWeaponAimMode()
+
+		if (weapon and weapon:IsValid()) then
+			weapon:Destroy()
+		end
+
+		local new_weapon = SpawnWeapon(player)
+
+		if (new_weapon) then
+			character:PickUp(new_weapon)
+			character:SetWeaponAimMode(old_aiming)
 		end
 	end
 end
@@ -399,8 +405,15 @@ function RespawnPlayer(player)
 
 	local character = player:GetControlledCharacter()
 
-	local spawn_point = DeathmatchSettings.spawn_locations[math.random(#DeathmatchSettings.spawn_locations)]
-	if (not spawn_point) then spawn_point = { location = Vector(math.random(-3000, 3000), math.random(-3000, 3000), 0), rotation = Rotator(0, math.random(-180, 180), 0) } end
+	-- Falls back to a random location when the map has no spawn points
+	local spawn_points = DeathmatchSettings.spawn_locations
+	local spawn_point = nil
+
+	if (#spawn_points > 0) then
+		spawn_point = spawn_points[math.random(#spawn_points)]
+	else
+		spawn_point = { location = Vector(math.random(-3000, 3000), math.random(-3000, 3000), 0), rotation = Rotator(0, math.random(-180, 180), 0) }
+	end
 
 	local spawn_location = spawn_point.location + Vector(0, 0, math.random(5000, 6000))
 	local spawn_rotation = spawn_point.rotation or Rotator(0, math.random(-180, 180), 0)
@@ -474,14 +487,17 @@ function SpawnWeapon(player)
 			weapon = weapon_func()
 		end
 	elseif (DeathmatchSettings.mode == GAME_MODE.GUNGAME) then
-		local player_score = player:GetValue("Score") or 0
+		local weapon_index = (player:GetValue("Score") or 0) + 1
 
 		-- Golden Knife
-		if (player_score >= #GunGameWeapons) then return nil end
+		if (weapon_index > #GunGameWeapons) then return nil end
 
-		local weapon_func = GunGameWeapons[player_score]
+		local weapon_func = GunGameWeapons[weapon_index]
 		weapon = weapon_func()
 	end
+
+	-- The configured mode or weapon list may not have produced a weapon
+	if (not weapon) then return nil end
 
 	weapon:SetAmmoBag(weapon:GetAmmoClip() * 3)
 

@@ -29,27 +29,27 @@ DefaultWeapons = {
 -- List of Weapons used in GunGame mode
 GunGameWeapons = {
 	-- Rifles
-	[0] = NanosWorldWeapons.AR4,
-	[1] = NanosWorldWeapons.GE36,
-	[2] = NanosWorldWeapons.GE3,
-	[3] = NanosWorldWeapons.AK47,
+	NanosWorldWeapons.AR4,
+	NanosWorldWeapons.GE36,
+	NanosWorldWeapons.GE3,
+	NanosWorldWeapons.AK47,
 	-- SMGs
-	[4] = NanosWorldWeapons.P90,
-	[5] = NanosWorldWeapons.UMP45,
-	[6] = NanosWorldWeapons.AP5,
+	NanosWorldWeapons.P90,
+	NanosWorldWeapons.UMP45,
+	NanosWorldWeapons.AP5,
 	-- Machine
-	[7] = NanosWorldWeapons.Lewis,
+	NanosWorldWeapons.Lewis,
 	-- Shotguns
-	[8] = NanosWorldWeapons.Rem870,
-	[9] = NanosWorldWeapons.Ithaca37,
-	[10] = NanosWorldWeapons.SPAS12,
+	NanosWorldWeapons.Rem870,
+	NanosWorldWeapons.Ithaca37,
+	NanosWorldWeapons.SPAS12,
 	-- Sniper
-	[11] = NanosWorldWeapons.AWP,
+	NanosWorldWeapons.AWP,
 	-- Pistols
-	[12] = NanosWorldWeapons.DesertEagle,
-	[13] = NanosWorldWeapons.Makarov,
-	[14] = NanosWorldWeapons.M1911,
-	[15] = NanosWorldWeapons.Glock,
+	NanosWorldWeapons.DesertEagle,
+	NanosWorldWeapons.Makarov,
+	NanosWorldWeapons.M1911,
+	NanosWorldWeapons.Glock,
 }
 
 CharacterMeshes = {
