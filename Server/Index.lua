@@ -25,13 +25,13 @@ Deathmatch = {
 -- Helper for spawning an announcer sound
 function SpawnActionSound(location, asset, player)
 	-- We make a small delay to sound better
-	Timer.SetTimeout(function(_asset)
+	Timer.SetTimeout(function()
 		if (player) then
-			Events.CallRemote("SpawnActionSound", player, Reliability.Reliable, location, _asset)
+			Events.CallRemote("SpawnActionSound", player, Reliability.Reliable, location, asset)
 		else
-			Events.BroadcastRemote("SpawnActionSound", Reliability.Reliable, location, _asset)
+			Events.BroadcastRemote("SpawnActionSound", Reliability.Reliable, location, asset)
 		end
-	end, 300, asset)
+	end, 300)
 end
 
 -- Function to Add a Kill to the Player's kill count
@@ -241,11 +241,11 @@ Character.Subscribe("Death", function(character, last_damage_taken, last_bone_da
 
 		-- Respawns after 5 seconds
 		Timer.Bind(
-			Timer.SetTimeout(function(_player)
+			Timer.SetTimeout(function()
 				if (Deathmatch.match_state ~= MATCH_STATES.POST_TIME) then
-					RespawnPlayer(_player)
+					RespawnPlayer(dead_player)
 				end
-			end, 5000, dead_player),
+			end, 5000),
 			dead_player
 		)
 	end
@@ -462,10 +462,10 @@ function RespawnPlayer(player)
 	character:SetMaterialColorParameter("Tint", Color.BLUE)
 
 	Timer.Bind(
-		Timer.SetTimeout(function(_character)
-			_character:SetMaterialColorParameter("Tint", Color.WHITE)
-			_character:SetInvulnerable(false)
-		end, 3000, character),
+		Timer.SetTimeout(function()
+			character:SetMaterialColorParameter("Tint", Color.WHITE)
+			character:SetInvulnerable(false)
+		end, 3000),
 		character
 	)
 
